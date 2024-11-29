@@ -363,10 +363,10 @@
         const headerContainer = document.querySelector(".header-container");
         const headerRect = headerContainer.getBoundingClientRect();
         const headerExclusionZone = {
-          left: headerRect.left - doorSize * 4, // Erweitere den linken Bereich
-          right: headerRect.right + doorSize * 4, // Erweitere den rechten Bereich
-          top: headerRect.top - doorSize * 4, // Erweitere den oberen Bereich
-          bottom: headerRect.bottom + doorSize * 4, // Erweitere den unteren Bereich
+          left: headerRect.left - doorSize * 3, // Erweitere den linken Bereich
+          right: headerRect.right + doorSize * 3, // Erweitere den rechten Bereich
+          top: headerRect.top - doorSize * 3, // Erweitere den oberen Bereich
+          bottom: headerRect.bottom + doorSize * 3, // Erweitere den unteren Bereich
         };
 
         function isInHeaderArea(x, y) {
