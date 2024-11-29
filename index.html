@@ -2,7 +2,10 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Adventskalender</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&display=swap"
@@ -48,18 +51,20 @@
       }
       .door {
         position: absolute;
-        width: 60px;
-        height: 60px;
+        width: calc(8vw); /* Türchengröße relativ zur Bildschirmbreite */
+        height: calc(8vw); /* Türchengröße relativ zur Bildschirmbreite */
+        max-width: 80px; /* Maximalgröße */
+        max-height: 80px; /* Maximalgröße */
         background-color: #c0392b;
         color: white;
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        font-size: 24px;
+        font-size: calc(2.5vw); /* Dynamische Schriftgröße */
         border-radius: 10px;
         transition: transform 0.3s;
-        z-index: 3; /* Höchster Z-Index, damit die Türchen über dem Schnee und dem Bild liegen */
+        z-index: 3;
       }
       .door.open {
         background-color: #27ae60;
@@ -77,17 +82,18 @@
         ); /* Weißer Hintergrund mit Transparenz */
         border-radius: 5px;
         text-align: center;
-        width: auto;
-        height: auto;
+        max-width: calc(
+          90vw - 20px
+        ); /* Inhalte passen auf kleinere Bildschirme */
+        max-height: calc(90vh - 20px);
         z-index: 4; /* Inhalt hat den höchsten Z-Index */
+        overflow: auto; /* Scrollbar für große Inhalte */
       }
-
-      .content img {
-        max-width: 500px;
-        max-height: 500px;
+      .content img,
+      .content video {
+        max-width: 100%; /* Inhalte passen in den verfügbaren Platz */
+        max-height: 100%;
       }
-
-      /* Weihnachtsdesign für Text */
       .content p {
         font-family: "Dancing Script", cursive; /* Festliche, aber lesbare Schriftart */
         color: #d32f2f; /* Dunkelrot für den Text */
@@ -95,7 +101,6 @@
         text-shadow: 2px 2px 4px #90ee90, 0px 0px 10px #32cd32; /* Dezenter Schatten-Effekt */
         margin: 10px 0;
       }
-
       .content h1 {
         font-family: "Raleway", sans-serif; /* Klar und edel */
         color: #b71c1c; /* Edler Rotton für Überschriften */
@@ -103,7 +108,6 @@
         margin-bottom: 10px;
         text-align: center;
       }
-      /* Glüh-Animation mit hellgrün */
       @keyframes glow {
         0% {
           text-shadow: 2px 2px 4px #90ee90, 0px 0px 10px #32cd32;
@@ -112,10 +116,29 @@
           text-shadow: 4px 4px 8px #7fff00, 0px 0px 20px #adff2f;
         }
       }
+
+      .door {
+        transition: all 0.3s ease;
+      }
+
+      .content {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        overflow: hidden; /* Prevent scrolling */
+      }
+
+      @media screen and (max-width: 600px) {
+        .content {
+          padding: 5px;
+        }
+      }
     </style>
   </head>
   <body>
-    <!-- Schnee-GIF hinzufügen -->
     <div class="snow">
       <img
         src="snow.gif"
@@ -124,7 +147,6 @@
       />
     </div>
 
-    <!-- Header-Bild in einer Container-Div -->
     <div class="header-container">
       <img src="Ueber.png" alt="Überschrift" class="header-image" />
     </div>
@@ -291,25 +313,15 @@
       const doors = [];
 
       const minSpace = 80; // Mindestabstand zwischen Türchen
-      const topLeftSpace = 200; // Abstand nach oben und links
-      const bottomRightSpace = 500; // Abstand nach unten und rechts
+      const padding = 10; // Abstand zum Rand
 
-      // Funktion zur Generierung einer zufälligen Position mit Randabstand
       function getRandomPosition() {
         let x, y, valid;
-        let attempts = 0; // Begrenzung der Versuche
         do {
           valid = true;
-          x =
-            Math.random() *
-              (window.innerWidth - 70 - topLeftSpace - bottomRightSpace) +
-            topLeftSpace;
-          y =
-            Math.random() *
-              (window.innerHeight - 70 - topLeftSpace - bottomRightSpace) +
-            topLeftSpace;
+          x = Math.random() * (window.innerWidth - padding * 2 - 80) + padding;
+          y = Math.random() * (window.innerHeight - padding * 2 - 80) + padding;
 
-          // Überprüfen, ob die neue Position weit genug von anderen Türchen entfernt ist
           for (let door of doors) {
             const dx = door.x - x;
             const dy = door.y - y;
@@ -319,66 +331,154 @@
               break;
             }
           }
-
-          attempts++;
-          if (attempts > 10000) break; // Verhindern, dass die Schleife unendlich läuft
         } while (!valid);
-
-        // Falls keine gültige Position gefunden wurde, erzwinge eine Position
-        if (!valid) {
-          x = Math.max(
-            topLeftSpace,
-            Math.min(window.innerWidth - 70 - bottomRightSpace, x)
-          );
-          y = Math.max(
-            topLeftSpace,
-            Math.min(window.innerHeight - 70 - bottomRightSpace, y)
-          );
-        }
-
         return { x, y };
       }
 
-      // Funktion zur Erstellung der Türchen
       function createDoors() {
-        calendar.innerHTML = ""; // Vorherige Inhalte löschen
-        doors.length = 0; // Türchenpositionen zurücksetzen
+        calendar.innerHTML = ""; // Clear previous content
+        doors.length = 0; // Reset door positions
 
-        calendarData.forEach((item) => {
+        // Dynamic sizing based on screen width
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        // Adaptive door sizing
+        const doorSize =
+          screenWidth < 600
+            ? Math.max(30, screenWidth * 0.07) // Smaller on mobile
+            : Math.min(60, screenWidth * 0.1); // Larger on desktop
+
+        const minSpace = doorSize * 1.5;
+
+        // Margins adaptive to screen size
+        const margins = {
+          top: Math.max(50, screenHeight * 0.05),
+          left: Math.max(50, screenWidth * 0.05),
+          bottom: Math.max(50, screenHeight * 0.1),
+          right: Math.max(50, screenWidth * 0.05),
+        };
+
+        // Calculate header area with generous buffer
+        const headerContainer = document.querySelector(".header-container");
+        const headerRect = headerContainer.getBoundingClientRect();
+        const headerExclusionZone = {
+          left: headerRect.left - doorSize * 4, // Erweitere den linken Bereich
+          right: headerRect.right + doorSize * 4, // Erweitere den rechten Bereich
+          top: headerRect.top - doorSize * 4, // Erweitere den oberen Bereich
+          bottom: headerRect.bottom + doorSize * 4, // Erweitere den unteren Bereich
+        };
+
+        function isInHeaderArea(x, y) {
+          return (
+            x >= headerExclusionZone.left &&
+            x <= headerExclusionZone.right &&
+            y >= headerExclusionZone.top &&
+            y <= headerExclusionZone.bottom
+          );
+        }
+
+        function getRandomPosition() {
+          const maxAttempts = 10000;
+          for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            const x =
+              margins.left +
+              Math.random() *
+                (screenWidth - margins.left - margins.right - doorSize);
+            const y =
+              margins.top +
+              Math.random() *
+                (screenHeight - margins.top - margins.bottom - doorSize);
+
+            // Check for overlap with header and existing doors
+            const isValidPosition =
+              !isInHeaderArea(x, y) &&
+              !doors.some((door) => {
+                const dx = Math.abs(door.x - x);
+                const dy = Math.abs(door.y - y);
+                return dx < minSpace && dy < minSpace;
+              });
+
+            if (isValidPosition) {
+              return { x, y };
+            }
+          }
+
+          // Fallback: grid-like approach
+          const gridX = doors.length % 5;
+          const gridY = Math.floor(doors.length / 5);
+          return {
+            x: margins.left + gridX * (doorSize + minSpace),
+            y: margins.top + gridY * (doorSize + minSpace),
+          };
+        }
+
+        // Rest of the original createDoors function remains the same
+        calendarData.forEach((item, index) => {
           const { x, y } = getRandomPosition();
           doors.push({ x, y });
 
           const door = document.createElement("div");
           door.classList.add("door");
           door.textContent = item.day;
+          door.style.width = `${doorSize}px`;
+          door.style.height = `${doorSize}px`;
+          door.style.fontSize = `${Math.max(12, doorSize * 0.4)}px`;
           door.style.left = `${x}px`;
           door.style.top = `${y}px`;
 
           const content = document.createElement("div");
           content.classList.add("content");
-          content.style.left = `${x + 70}px`; // Platz für das Türchen und den Inhalt
-          content.style.top = `${y}px`;
 
-          let img;
+          // Content sizing
+          const contentWidth =
+            screenWidth < 600
+              ? screenWidth * 0.9 // 90% of screen width on mobile
+              : Math.min(500, screenWidth * 0.7); // Capped at 500px or 70% on desktop
+
+          const contentMaxHeight = screenHeight * 0.7;
+
+          // Positioning logic
+          let contentX = x + doorSize + 10;
+          let contentY = y;
+
+          // Adjust if content would go off-screen
+          if (contentX + contentWidth > screenWidth) {
+            contentX = x - contentWidth - 10;
+          }
+
+          if (contentY + contentMaxHeight > screenHeight) {
+            contentY = screenHeight - contentMaxHeight;
+          }
+
+          content.style.left = `${contentX}px`;
+          content.style.top = `${contentY}px`;
+          content.style.width = `${contentWidth}px`;
+          content.style.maxHeight = `${contentMaxHeight}px`;
+
+          // Media handling
           if (item.image) {
-            img = document.createElement("img");
-            img.style.display = "none"; // Bild zunächst verstecken
+            const img = document.createElement("img");
             img.src = item.image;
-            img.onload = () => (img.style.display = "block"); // Bild anzeigen, wenn es geladen ist
+            img.style.maxWidth = "100%";
+            img.style.maxHeight = "250px";
+            img.style.objectFit = "contain";
             content.appendChild(img);
           }
+
           if (item.video) {
             const video = document.createElement("video");
             video.src = item.video;
             video.controls = true;
-            video.style.maxWidth = "500px";
-            video.style.maxHeight = "500px";
+            video.style.maxWidth = "100%";
+            video.style.maxHeight = "250px";
             content.appendChild(video);
           }
 
           if (item.content) {
             const text = document.createElement("p");
             text.textContent = item.content;
+            text.style.fontSize = `${Math.max(14, screenWidth * 0.03)}px`;
             content.appendChild(text);
           }
 
@@ -390,13 +490,27 @@
 
           door.addEventListener("click", () => {
             const isOpen = door.classList.toggle("open");
+
+            // Reduce door size when content is open on small screens
+            if (screenWidth < 600) {
+              door.style.width = isOpen
+                ? `${doorSize * 0.7}px`
+                : `${doorSize}px`;
+              door.style.height = isOpen
+                ? `${doorSize * 0.7}px`
+                : `${doorSize}px`;
+              door.style.fontSize = isOpen
+                ? `${Math.max(10, doorSize * 0.3)}px`
+                : `${Math.max(12, doorSize * 0.4)}px`;
+            }
+
             content.style.display = isOpen ? "block" : "none";
 
             if (isOpen && audio) {
               audio
                 .play()
                 .catch((error) =>
-                  console.error("Audio konnte nicht abgespielt werden:", error)
+                  console.error("Audio could not be played:", error)
                 );
             } else if (!isOpen && audio) {
               audio.pause();
@@ -409,24 +523,15 @@
         });
       }
 
-      // Funktion zum Anpassen der Positionen bei Größenänderung
+      // Adjust positions on window resize
       function adjustPositions() {
-        doors.forEach((door, index) => {
-          const { x, y } = getRandomPosition();
-          const doorElement = calendar.children[index * 2]; // Türchen-Element
-          const contentElement = calendar.children[index * 2 + 1]; // Inhalt-Element
-
-          doorElement.style.left = `${x}px`;
-          doorElement.style.top = `${y}px`;
-          contentElement.style.left = `${x + 70}px`;
-          contentElement.style.top = `${y}px`;
-        });
+        createDoors(); // Regenerate entire layout on resize
       }
 
-      // Initiale Erstellung der Türchen
+      // Initial door creation
       createDoors();
 
-      // Event Listener für die Größenänderung des Fensters
+      // Resize event listener
       window.addEventListener("resize", adjustPositions);
     </script>
   </body>
