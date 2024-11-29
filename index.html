@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adventskalender</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Raleway:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
       body {
         margin: 0;
@@ -60,16 +69,48 @@
         display: none;
         position: absolute;
         padding: 10px;
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: rgba(
+          255,
+          255,
+          255,
+          0.9
+        ); /* Weißer Hintergrund mit Transparenz */
         border-radius: 5px;
         text-align: center;
         width: auto;
         height: auto;
         z-index: 4; /* Inhalt hat den höchsten Z-Index */
       }
+
       .content img {
         max-width: 500px;
         max-height: 500px;
+      }
+
+      /* Weihnachtsdesign für Text */
+      .content p {
+        font-family: "Dancing Script", cursive; /* Festliche, aber lesbare Schriftart */
+        color: #d32f2f; /* Dunkelrot für den Text */
+        font-size: 24px; /* Größere Schrift */
+        text-shadow: 2px 2px 4px #90ee90, 0px 0px 10px #32cd32; /* Dezenter Schatten-Effekt */
+        margin: 10px 0;
+      }
+
+      .content h1 {
+        font-family: "Raleway", sans-serif; /* Klar und edel */
+        color: #b71c1c; /* Edler Rotton für Überschriften */
+        font-size: 32px;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      /* Glüh-Animation mit hellgrün */
+      @keyframes glow {
+        0% {
+          text-shadow: 2px 2px 4px #90ee90, 0px 0px 10px #32cd32;
+        }
+        100% {
+          text-shadow: 4px 4px 8px #7fff00, 0px 0px 20px #adff2f;
+        }
       }
     </style>
   </head>
