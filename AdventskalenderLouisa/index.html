@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adventskalender</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: url("Background.jpg") no-repeat center center/cover;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+      }
+      .snow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1; /* Niedrigerer Z-Index, damit die Türchen darüber liegen */
+      }
+      .header-container {
+        position: absolute;
+        top: 20px; /* Abstand von oben */
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2; /* Höherer Z-Index als der Schnee, aber niedriger als die Türchen */
+      }
+      .header-image {
+        max-width: 80%; /* Maximale Breite auf 80% setzen */
+      }
+      .calendar {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      .door {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background-color: #c0392b;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        font-size: 24px;
+        border-radius: 10px;
+        transition: transform 0.3s;
+        z-index: 3; /* Höchster Z-Index, damit die Türchen über dem Schnee und dem Bild liegen */
+      }
+      .door.open {
+        background-color: #27ae60;
+        transform: scale(1.1);
+      }
+      .content {
+        display: none;
+        position: absolute;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        text-align: center;
+        width: auto;
+        height: auto;
+        z-index: 4; /* Inhalt hat den höchsten Z-Index */
+      }
+      .content img {
+        max-width: 500px;
+        max-height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Schnee-GIF hinzufügen -->
+    <div class="snow">
+      <img
+        src="snow.gif"
+        alt="Schnee"
+        style="width: 100%; height: 100%; object-fit: cover"
+      />
+    </div>
+
+    <!-- Header-Bild in einer Container-Div -->
+    <div class="header-container">
+      <img src="Ueber.png" alt="Überschrift" class="header-image" />
+    </div>
+
+    <div class="calendar" id="calendar"></div>
+
+    <script>
+      const calendarData = [
+        {
+          day: 1,
+          content: "Mach den Ton an ❤️😏",
+          image: "",
+          audio: "LeoWantsForChristmas.mp3",
+        },
+        {
+          day: 2,
+          content: "Frisur so wild wie unsere Liebe 😋😘",
+          image: "wildeFrise.jpg",
+          audio: "",
+        },
+        {
+          day: 3,
+          content:
+            "Nischen-Ökologie-Fakt: Seegraswiesen sind Mega! Diese Unterwasserpflanzen speichern CO₂ und bieten Lebensraum für viele Meeresarten. Eine Fläche von Seegraswiesen kann 35 Mal mehr CO₂ speichern als die gleiche Fläche Regenwald.",
+          image: "seahorse.png",
+          audio: "audio3.mp3",
+        },
+        {
+          day: 4,
+          content: "",
+          image: "GutscheinSchlittschuh.jpg",
+          audio: "",
+        },
+        {
+          day: 5,
+          content: "Ich wenn du etwas ausziehst😇",
+          image: "sloth.gif",
+          audio: "",
+        },
+        {
+          day: 6,
+          content:
+            "Falls ich milchfreie Nikoläuse finde, können wir uns aus denen Haferkakao machen 😏🤩 ",
+          image: "nikolaus.jpg",
+          audio: "",
+        },
+        {
+          day: 7,
+          content:
+            "Nischen-Ökologie-Fakt: Pilze sind Mega!  Pilze zersetzen organische Materie und spielen eine Schlüsselrolle im Kohlenstoffkreislauf. Einige Arten können sogar Kunststoffe und Erdölabbauprodukte abbauen.",
+          image: "toad.gif",
+          audio: "",
+        },
+        {
+          day: 8,
+          content: "Dein Badboy 😎😘",
+          image: "Badboy.jpg",
+          audio: "",
+        },
+        {
+          day: 9,
+          content: "Gutschein dich bekochen zu lassen❤️",
+          image: "sanji.gif",
+          audio: "",
+        },
+        {
+          day: 10,
+          content: "😍",
+          video: "Dance.MP4",
+          audio: "",
+        },
+        {
+          day: 11,
+          content: "Carolus Thermen Date 😏😘",
+          image: "Sauna.gif",
+          audio: "",
+        },
+        {
+          day: 12,
+          content:
+            "Nischen-Ökologie-Fakt: Wale sind Mega! Wale speichern Kohlenstoff in ihren Körpern. Wenn sie sterben und auf den Meeresboden sinken, bleibt der Kohlenstoff für Hunderte von Jahren gebunden.",
+          image: "Wal.gif",
+          audio: "",
+        },
+        {
+          day: 13,
+          content: "Gutschein für einen Tanzabend",
+          image: "Tanz.jpg",
+          audio: "",
+        },
+        {
+          day: 14,
+          content: "",
+          image: "Spyd.jpg",
+          audio: "",
+        },
+        {
+          day: 15,
+          content:
+            "Nischen-Ökologie-Fakt: Bäume „flüstern“ miteinander! Über ein unterirdisches Netzwerk aus Pilzen, das „Wood Wide Web“, kommunizieren Bäume miteinander. Sie warnen sich vor Gefahren wie Schädlingen oder teilen Nährstoffe mit benachbarten Bäumen.",
+          image: "baum.jpg",
+          audio: "",
+        },
+        {
+          day: 16,
+          content: "",
+          image: "lick.JPEG",
+          audio: "",
+        },
+        {
+          day: 17,
+          content: "Gutschein für Liebesfilm-Abend",
+          image: "movie.jpg",
+          audio: "",
+        },
+        {
+          day: 18,
+          content: "🥰",
+          video: "Ingwer.mp4",
+          audio: "",
+        },
+        {
+          day: 19,
+          content:
+            "Nischen-Ökologie-Fakt: Glühwürmchen sind Mega! Das Enzym „Luciferase“, das Glühwürmchen ihr Leuchten verleiht, wird in der medizinischen Forschung eingesetzt, um zelluläre Prozesse sichtbar zu machen. ",
+          image: "Glühwürmchen.gif",
+          audio: "",
+        },
+        {
+          day: 20,
+          content: "kleiner Flashback 😏❤️😘",
+          video: "flashback.mp4",
+          audio: "",
+        },
+        {
+          day: 21,
+          content:
+            "Weil es dir bestimmt so gut gefallen wird, hier einen zweiten Gutschein dich ordentlich bekochen zu lassen ❤️😘",
+          image: "Sanji2.gif",
+          audio: "",
+        },
+        {
+          day: 22,
+          content:
+            "Nischen-Ökologie-Fakt: Eisbären halten Wärme durch Luft statt Fett! Eisbären wirken fluffig, weil ihr Fell transparent ist und Luft einschließt, die als Isolator fungiert. Ihre schwarze Haut darunter maximiert die Wärmeaufnahme aus Sonnenlicht.",
+          image: "Eisbär.gif",
+          audio: "",
+        },
+        {
+          day: 23,
+          content: "",
+          image: "Mua.gif",
+          audio: "",
+        },
+        {
+          day: 24,
+          content: "Frohe Weihnachten!❤️",
+          video: "Mausvid.mp4",
+          audio: "audio24.mp3",
+        },
+      ];
+
+      const calendar = document.getElementById("calendar");
+      const doors = [];
+
+      const minSpace = 80; // Mindestabstand zwischen Türchen
+      const topLeftSpace = 200; // Abstand nach oben und links
+      const bottomRightSpace = 500; // Abstand nach unten und rechts
+
+      // Funktion zur Generierung einer zufälligen Position mit Randabstand
+      function getRandomPosition() {
+        let x, y, valid;
+        let attempts = 0; // Begrenzung der Versuche
+        do {
+          valid = true;
+          x =
+            Math.random() *
+              (window.innerWidth - 70 - topLeftSpace - bottomRightSpace) +
+            topLeftSpace;
+          y =
+            Math.random() *
+              (window.innerHeight - 70 - topLeftSpace - bottomRightSpace) +
+            topLeftSpace;
+
+          // Überprüfen, ob die neue Position weit genug von anderen Türchen entfernt ist
+          for (let door of doors) {
+            const dx = door.x - x;
+            const dy = door.y - y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < minSpace) {
+              valid = false;
+              break;
+            }
+          }
+
+          attempts++;
+          if (attempts > 10000) break; // Verhindern, dass die Schleife unendlich läuft
+        } while (!valid);
+
+        // Falls keine gültige Position gefunden wurde, erzwinge eine Position
+        if (!valid) {
+          x = Math.max(
+            topLeftSpace,
+            Math.min(window.innerWidth - 70 - bottomRightSpace, x)
+          );
+          y = Math.max(
+            topLeftSpace,
+            Math.min(window.innerHeight - 70 - bottomRightSpace, y)
+          );
+        }
+
+        return { x, y };
+      }
+
+      // Funktion zur Erstellung der Türchen
+      function createDoors() {
+        calendar.innerHTML = ""; // Vorherige Inhalte löschen
+        doors.length = 0; // Türchenpositionen zurücksetzen
+
+        calendarData.forEach((item) => {
+          const { x, y } = getRandomPosition();
+          doors.push({ x, y });
+
+          const door = document.createElement("div");
+          door.classList.add("door");
+          door.textContent = item.day;
+          door.style.left = `${x}px`;
+          door.style.top = `${y}px`;
+
+          const content = document.createElement("div");
+          content.classList.add("content");
+          content.style.left = `${x + 70}px`; // Platz für das Türchen und den Inhalt
+          content.style.top = `${y}px`;
+
+          let img;
+          if (item.image) {
+            img = document.createElement("img");
+            img.style.display = "none"; // Bild zunächst verstecken
+            img.src = item.image;
+            img.onload = () => (img.style.display = "block"); // Bild anzeigen, wenn es geladen ist
+            content.appendChild(img);
+          }
+          if (item.video) {
+            const video = document.createElement("video");
+            video.src = item.video;
+            video.controls = true;
+            video.style.maxWidth = "500px";
+            video.style.maxHeight = "500px";
+            content.appendChild(video);
+          }
+
+          if (item.content) {
+            const text = document.createElement("p");
+            text.textContent = item.content;
+            content.appendChild(text);
+          }
+
+          let audio;
+          if (item.audio) {
+            audio = new Audio(item.audio);
+            audio.volume = 1.0;
+          }
+
+          door.addEventListener("click", () => {
+            const isOpen = door.classList.toggle("open");
+            content.style.display = isOpen ? "block" : "none";
+
+            if (isOpen && audio) {
+              audio
+                .play()
+                .catch((error) =>
+                  console.error("Audio konnte nicht abgespielt werden:", error)
+                );
+            } else if (!isOpen && audio) {
+              audio.pause();
+              audio.currentTime = 0;
+            }
+          });
+
+          calendar.appendChild(door);
+          calendar.appendChild(content);
+        });
+      }
+
+      // Funktion zum Anpassen der Positionen bei Größenänderung
+      function adjustPositions() {
+        doors.forEach((door, index) => {
+          const { x, y } = getRandomPosition();
+          const doorElement = calendar.children[index * 2]; // Türchen-Element
+          const contentElement = calendar.children[index * 2 + 1]; // Inhalt-Element
+
+          doorElement.style.left = `${x}px`;
+          doorElement.style.top = `${y}px`;
+          contentElement.style.left = `${x + 70}px`;
+          contentElement.style.top = `${y}px`;
+        });
+      }
+
+      // Initiale Erstellung der Türchen
+      createDoors();
+
+      // Event Listener für die Größenänderung des Fensters
+      window.addEventListener("resize", adjustPositions);
+    </script>
+  </body>
+</html>
