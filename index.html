@@ -157,9 +157,9 @@
       const calendarData = [
         {
           day: 1,
-          content: "Mach den Ton an ❤️😏",
-          image: "",
-          audio: "LeoWantsForChristmas.mp3",
+          content: "Gutschein dich bekochen zu lassen❤️",
+          image: "sanji.gif",
+          audio: "",
         },
         {
           day: 2,
@@ -208,9 +208,9 @@
         },
         {
           day: 9,
-          content: "Gutschein dich bekochen zu lassen❤️",
-          image: "sanji.gif",
-          audio: "",
+          content: "Mach den Ton an ❤️😏",
+          image: "Engel.gif",
+          audio: "LeoWantsForChristmas.mp3",
         },
         {
           day: 10,
@@ -363,10 +363,10 @@
         const headerContainer = document.querySelector(".header-container");
         const headerRect = headerContainer.getBoundingClientRect();
         const headerExclusionZone = {
-          left: headerRect.left - doorSize * 3, // Erweitere den linken Bereich
-          right: headerRect.right + doorSize * 3, // Erweitere den rechten Bereich
-          top: headerRect.top - doorSize * 3, // Erweitere den oberen Bereich
-          bottom: headerRect.bottom + doorSize * 3, // Erweitere den unteren Bereich
+          left: headerRect.left - doorSize * 3,
+          right: headerRect.right + doorSize * 3,
+          top: headerRect.top - doorSize * 3,
+          bottom: headerRect.bottom + doorSize * 3,
         };
 
         function isInHeaderArea(x, y) {
@@ -390,7 +390,6 @@
               Math.random() *
                 (screenHeight - margins.top - margins.bottom - doorSize);
 
-            // Check for overlap with header and existing doors
             const isValidPosition =
               !isInHeaderArea(x, y) &&
               !doors.some((door) => {
@@ -413,7 +412,6 @@
           };
         }
 
-        // Rest of the original createDoors function remains the same
         calendarData.forEach((item, index) => {
           const { x, y } = getRandomPosition();
           doors.push({ x, y });
@@ -433,8 +431,8 @@
           // Content sizing
           const contentWidth =
             screenWidth < 600
-              ? screenWidth * 0.9 // 90% of screen width on mobile
-              : Math.min(500, screenWidth * 0.7); // Capped at 500px or 70% on desktop
+              ? screenWidth * 0.9
+              : Math.min(500, screenWidth * 0.7);
 
           const contentMaxHeight = screenHeight * 0.7;
 
@@ -442,7 +440,6 @@
           let contentX = x + doorSize + 10;
           let contentY = y;
 
-          // Adjust if content would go off-screen
           if (contentX + contentWidth > screenWidth) {
             contentX = x - contentWidth - 10;
           }
@@ -489,6 +486,19 @@
           }
 
           door.addEventListener("click", () => {
+            // Überprüfe das aktuelle Datum
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const doorDate = new Date(currentYear, 11, item.day); // 11 ist Dezember (0-basiert)
+
+            // Wenn das aktuelle Datum vor dem Türchentag liegt
+            if (currentDate < doorDate) {
+              alert(
+                `Sie dürfen dieses Türchen erst am ${item.day}. Dezember öffnen!`
+              );
+              return;
+            }
+
             const isOpen = door.classList.toggle("open");
 
             // Reduce door size when content is open on small screens
